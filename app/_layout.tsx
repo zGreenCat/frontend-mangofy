@@ -1,24 +1,27 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
+import { default as index, default as library, default as search } from "@/app/(tabs)";
+import { Ionicons } from '@expo/vector-icons';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { StatusBar } from 'react-native';
 import 'react-native-reanimated';
-
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+import { SafeAreaProvider } from "react-native-safe-area-context";
+const Tab = createBottomTabNavigator();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <SafeAreaProvider >
+      <StatusBar barStyle="light-content" />  
+      <Tab.Navigator 
+      screenOptions={{
+        headerShown: false,
+        tabBarStyle: { backgroundColor: '#121212', borderTopColor: "#222" },
+        tabBarActiveTintColor: '#fff',
+        tabBarInactiveTintColor: '#b3b3b3',
+      }}>
+        <Tab.Screen name="Home" component={index} options={{tabBarIcon: ({color,size}) => <Ionicons name="home" size= {size} color={color} />,}}/>
+        <Tab.Screen name="Buscar" component={search} />
+        <Tab.Screen name="Tu Biblioteca" options={{title: 'Tu Biblioteca'}} component={library} />
+      </Tab.Navigator>
+    </SafeAreaProvider>
   );
 }
