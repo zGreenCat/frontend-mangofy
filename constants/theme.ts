@@ -25,6 +25,17 @@ export const Colors = {
     tabIconDefault: '#9BA1A6',
     tabIconSelected: tintColorDark,
   },
+    bgYellow: '#FFEF80',   // fondo principal
+    orange: '#FFB366',     // botón / borde / acentos
+    red: '#FF8066',        // acento secundario (título)
+    green: '#8DD177',      // acento opcional
+    beige: '#F5EAD0',      // tarjeta
+    card: '#FFFFFF',       // tarjeta alternativa 
+    inputBg: '#FFF9ED',    // fondo inputs
+    textDark: '#2B1F12',   // texto sobre claros
+    textLight: '#0B0B0B',  // texto oscuro general
+    purple: '#6B3F9F',
+    strongOrange: '#F7A32F',
 };
 
 export const Fonts = Platform.select({
