@@ -1,6 +1,6 @@
 import { api, clearSession, initAuth, setSession } from '@/src/services/api';
 import * as SecureStore from 'expo-secure-store';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 
 type User = { id: string; name: string; email: string } | null;
 type AuthContextValue = {
@@ -11,7 +11,7 @@ type AuthContextValue = {
   logout: () => Promise<void>;
 };
 
-const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+
 
 // Si quieres mock rápido, cambia a true
 const USE_MOCK_AUTH = false;
@@ -116,8 +116,4 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
-  return ctx;
-}
+export const AuthContext = createContext<AuthContextValue | undefined>(undefined);

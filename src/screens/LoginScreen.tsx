@@ -5,7 +5,7 @@ import Svg, { Circle } from 'react-native-svg';
 import { Colors } from '../../constants/theme';
 import AuthForm from '../components/AuthForm';
 import RegisterForm from '../components/RegisterForm';
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 export default function LoginScreen() {
     const { login, register} = useAuth();
     const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -56,7 +56,7 @@ export default function LoginScreen() {
         setMode((prevMode) => (prevMode === 'login' ? 'register' : 'login'));
     }
   return (
-  <SafeAreaView style={[styles.container, { backgroundColor: Colors.beige }]}>
+  <SafeAreaView style={[styles.container, { backgroundColor: Colors.strongOrange }]}>
    <Svg
         width={SCREEN_WIDTH * 1.8}
         height={SCREEN_WIDTH * 1.8}
@@ -64,15 +64,15 @@ export default function LoginScreen() {
         preserveAspectRatio="xMidYMid slice"
         style={[styles.bgSvg, { left: -(SCREEN_WIDTH * 0.4), top: -(SCREEN_WIDTH * 0.6) }]}
       >
-        <Circle cx="50" cy="50" r="50" fill={Colors.green} opacity={0.14} />
+        <Circle cx="50" cy="50" r="50" fill={Colors.purple}  />
       </Svg>
-    <View style={styles.header}>
-        <Image source={require('../../assets/images/mango.png')} style={styles.logo} />
-        <Text style={styles.title}>MangoFy</Text>
+    <View style={styles.headerRow}>
+        <Image source={require('../../assets/images/mango.png')} style={styles.logoRow} />
+        <Text style={styles.titleRow}>MangoFy</Text>
     </View>
       
          <View style={[styles.container2, mode === 'register' && styles.container2Register]}>
-         {/* formWrapper ahora cambia su minHeight según el modo */}
+        
          <View style={[styles.formWrapper, mode === 'register' ? styles.formWrapperRegister : styles.formWrapperLogin]}>
          <Animated.View
             pointerEvents={mode === 'login' ? 'auto' : 'none'}
@@ -100,29 +100,31 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, paddingHorizontal: 20, paddingTop: 24, justifyContent: 'center' },
-     header: {
+    headerRow: {
     width: '100%',
-    alignItems: 'center',      // centra el logo y el texto horizontalmente
-    justifyContent: 'center',
-    marginBottom: 40,         // aumenta separación entre título y tarjeta
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center', 
+    gap: 12,                   
+    marginBottom: 150,
     paddingTop: 6,
     zIndex: 3,
   },
-    logo: {
-    width: 52,
-    height: 52,
-    marginBottom: 6,          // logo encima del texto con pequeño espacio
+   logoRow: {
+    width: 48,
+    height: 55,
+    marginRight: 12, 
     borderRadius: 8,
   },
-      title: {
+   titleRow: {
     fontSize: 32,
     fontWeight: '800',
-    color: Colors.red,
-    textAlign: 'center',
+    color: Colors.white,
+    textAlign: 'left',
     lineHeight: 36,
   },
 
-  // tarjeta ajustada al contenido
+
      container2: {
     borderRadius: 16,
     alignSelf: 'center',
@@ -152,20 +154,20 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderWidth: 1,
     borderColor: Colors.orange,
-    zIndex: 4, // evitar que quede por debajo de capas absolutas
+    zIndex: 4, 
   },
   toggleText: { color: Colors.orange, fontSize: 16, fontWeight: '700' },
 
-  // círculo decorativo
+
    bgCircle: {
     position: 'absolute',
-    width: 600,              // tamaño grande para formar un arco suave
+    width: 600,             
     height: 600,
     borderRadius: 300,
-    backgroundColor: Colors.green, // usa el verde de tu paleta
-           // baja opacidad para que no compita
-    right: -180,            // mueve hacia la derecha (ajusta para tu layout)
-    top: -340,              // negativo para que solo se vea la parte inferior del círculo
+    backgroundColor: Colors.green, 
+         
+    right: -180,           
+    top: -340,             
     zIndex: 0,
   },
    bgSvg: {
@@ -177,10 +179,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   formWrapperLogin: {
-    minHeight: 220, // menos espacio para login (ajusta si hace falta)
+    minHeight: 220, 
   },
   formWrapperRegister: {
-    minHeight: 380, // más espacio para register (evita solapamientos)
+    minHeight: 380, 
   },
 
    absoluteLayer: {

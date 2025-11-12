@@ -36,6 +36,7 @@ export const Colors = {
     textLight: '#0B0B0B',  // texto oscuro general
     purple: '#6B3F9F',
     strongOrange: '#F7A32F',
+    white: '#FFFFFF',
 };
 
 export const Fonts = Platform.select({

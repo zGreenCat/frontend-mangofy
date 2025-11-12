@@ -1,19 +1,24 @@
-import { default as index, default as library, default as search } from "@/app/(tabs)";
+
 import LoginScreen from "@/src/screens/LoginScreen";
 import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { ActivityIndicator, StatusBar, View } from 'react-native';
 import 'react-native-reanimated';
-import { AuthProvider, useAuth } from '../src/contexts/AuthContext';
+import { Colors } from "../constants/theme";
+import { AuthProvider } from '../src/contexts/AuthContext';
+import { useAuth } from '../src/hooks/useAuth';
 
+import ExploreScreen from '@/app/(tabs)/explore';
+import HomeScreen from '@/app/(tabs)/index';
+import LibraryScreen from '@/app/(tabs)/library';
 const Tab = createBottomTabNavigator();
 
 function AuthGate() {
-  const {user, loading} = useAuth();
+  const { user, loading } = useAuth();
 
-  if(loading) {
+  if (loading) {
     return (
-      <View style= {{flex:1,alignItems: 'center', justifyContent: 'center', backgroundColor: '#000'}}>
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.strongOrange }}>
         <ActivityIndicator size="large" color="#fff" />
       </View>
     )
@@ -24,13 +29,15 @@ function AuthGate() {
     <Tab.Navigator 
       screenOptions={{
         headerShown: false,
-        tabBarStyle: { backgroundColor: '#121212', borderTopColor: "#222" },
+        tabBarStyle: { backgroundColor: Colors.purple, borderTopColor: "#222" },
         tabBarActiveTintColor: '#fff',
-        tabBarInactiveTintColor: '#b3b3b3',
+        tabBarInactiveTintColor: '#fff',
       }}>
-        <Tab.Screen name="Home" component={index} options={{tabBarIcon: ({color,size}) => <Ionicons name="home" size= {size} color={color} />,}}/>
-        <Tab.Screen name="Buscar" component={search} />
-        <Tab.Screen name="Tu Biblioteca" options={{title: 'Tu Biblioteca'}} component={library} />
+    
+        
+        <Tab.Screen name="Home"  component={HomeScreen} options={{tabBarIcon: ({color,size}) => <Ionicons name="home" size= {size} color={color} />,}}/>
+        <Tab.Screen name="Buscar" component={ExploreScreen} options={{tabBarIcon: ({color,size}) => <Ionicons name="search" size={size} color={color} />,}} />
+        <Tab.Screen name="Tu Biblioteca" options={{title: 'Tu Biblioteca', tabBarIcon: ({color,size}) => <Ionicons name="library" size={size} color={color} />,}} component={LibraryScreen} />
       </Tab.Navigator>
   )
 }

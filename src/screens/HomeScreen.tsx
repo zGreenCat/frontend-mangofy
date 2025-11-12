@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
   Dimensions,
@@ -14,7 +15,6 @@ import { Colors } from '../../constants/theme';
 import HorizontalSection from '../components/HorizontalSection';
 import NewReleaseCard from '../components/NewReleaseCard';
 import RecentTile from '../components/RecentTile';
-
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = Math.round(SCREEN_WIDTH * 0.86);
 const CARD_HEIGHT = Math.round(CARD_WIDTH * 0.56);
@@ -70,7 +70,7 @@ export default function HomeScreen() {
         artist={item.artist}
         track={item.track}
         onPress={() => {
-          // abrir player o modal
+    
         }}
       />
     );
@@ -79,12 +79,20 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: Colors.beige }]}>
       <View style={styles.header}>
-        <Text style={styles.title}>MangoFy</Text>
-        <Text style={styles.subtitle}>Nuevos lanzamientos</Text>
+        <Text style={styles.title}>Buenos dias</Text>
+        <View style={styles.headerIcons}>
+           <TouchableOpacity>
+          <Ionicons name="notifications" size={24} color={Colors.orange} />
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Ionicons name="settings" size={24} color={Colors.orange} />
+        </TouchableOpacity>
+        </View>
+       
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        {/* Carrusel principal */}
+ 
         <View style={styles.carouselWrapper}>
           <FlatList
             data={mockCarousel}
@@ -98,7 +106,7 @@ export default function HomeScreen() {
           />
         </View>
 
-        {/* NUEVOS LANZAMIENTOS: carrusel horizontal con las portadas como card */}
+
         <View style={[styles.sectionRow, { marginBottom: 10 }]}>
           <Text style={styles.sectionTitle}>Lanzamientos</Text>
           <FlatList
@@ -112,7 +120,6 @@ export default function HomeScreen() {
           />
         </View>
 
-        {/* sección principal estilo "card" con contenido debajo */}
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Buenos días</Text>
 
@@ -136,20 +143,30 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: {
-    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
     marginTop: 8,
     marginBottom: 6,
     zIndex: 2,
+    marginLeft: 12,
   },
   title: { fontSize: 28, fontWeight: '800', color: Colors.red, textAlign: 'center' },
   subtitle: { fontSize: 13, color: Colors.textDark, marginTop: 4 },
+  headerIcons: {
+    flexDirection: 'row',
+    marginLeft: 'auto',
+    alignItems: 'center',
+    marginRight: 12,
+    width: 80,
+    justifyContent: 'space-between',
+  },
 
   scrollContent: {
     paddingTop: 6,
     paddingBottom: 24,
   },
 
-  // carousel
+
   carouselWrapper: {
     marginTop: 8,
     marginBottom: 18,
@@ -183,7 +200,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 
-  // sección lanzamientos y contenido
+ 
   sectionRow: {
     marginTop: 6,
   },
@@ -194,7 +211,7 @@ const styles = StyleSheet.create({
     marginLeft: SPACING,
   },
 
-  // contenido debajo
+
   card: {
     marginHorizontal: SPACING,
     borderRadius: 12,
