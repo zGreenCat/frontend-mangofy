@@ -1,4 +1,4 @@
-import { api, clearSession, initAuth, setSession } from '@/src/services/api';
+import { api, clearSession, getAccessToken, initAuth, setSession } from '@/src/services/api';
 import * as SecureStore from 'expo-secure-store';
 import React, { createContext, useEffect, useState } from 'react';
 
@@ -9,6 +9,8 @@ type AuthContextValue = {
   login: (email: string, password: string) => Promise<User>;
   register: (name: string, email: string, password: string) => Promise<User>;
   logout: () => Promise<void>;
+  accessToken: string | null; 
+  getAuthHeader: () => { Authorization: string } | {};
 };
 
 
@@ -25,6 +27,7 @@ function withTimeout<T>(p: Promise<T>, ms = 7000): Promise<T> {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User>(null);
   const [loading, setLoading] = useState(true);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -37,12 +40,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         // initAuth puede hacer refresh; lo envolvemos con timeout para evitar bloqueos
-        try {
+         try {
           await withTimeout(initAuth(), 7000);
+          // tras initAuth, lee el access vigente desde tu servicio
+          const t = getAccessToken?.() || null;
+          if (mounted) setAccessToken(t);
         } catch (e) {
           console.warn('[Auth] initAuth failed or timed out:', (e as Error).message);
-          // si falla, intentar leer refreshToken localmente y borrarlo para evitar loops
           await SecureStore.deleteItemAsync('refreshToken').catch(() => {});
+          if (mounted) setAccessToken(null);
         }
 
         // Si tienes endpoint /me puedes obtener perfil aquí. Ejemplo:
@@ -72,11 +78,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const mock = { id: 'u1', name: 'Usuario Mock', email };
       await SecureStore.setItemAsync(MOCK_USER_KEY, JSON.stringify(mock));
       setUser(mock);
+      setAccessToken('mock-token'); // opcional
       return mock;
     }
 
-    const { data } = await api.post('/auth/login', { email, password });
+    const { data } = await api.post('/api/auth/login', { email, password });
     await setSession({ accessToken: data.accessToken, refreshToken: data.refreshToken });
+    setAccessToken(data.accessToken);                 
     setUser(data.user ?? null);
     return data.user ?? null;
   }
@@ -87,11 +95,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const mock = { id: 'u' + Date.now(), name, email };
       await SecureStore.setItemAsync(MOCK_USER_KEY, JSON.stringify(mock));
       setUser(mock);
+      setAccessToken('mock-token'); // opcional
       return mock;
     }
 
-    const { data } = await api.post('/auth/register', { email, password, name });
+    const { data } = await api.post('/api/auth/register', { email, password, name });
     await setSession({ accessToken: data.accessToken, refreshToken: data.refreshToken });
+    setAccessToken(data.accessToken);                
     setUser(data.user ?? null);
     return data.user ?? null;
   }
@@ -100,17 +110,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (USE_MOCK_AUTH) {
       await SecureStore.deleteItemAsync(MOCK_USER_KEY);
       setUser(null);
+      setAccessToken(null);                           // 👈 limpia token
       return;
     }
     try {
       await clearSession();
     } finally {
       setUser(null);
+      setAccessToken(null);                           // 👈 limpia token
     }
   }
-
+  function getAuthHeader() {
+    return accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
+  }
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+     <AuthContext.Provider value={{ user, loading, accessToken, login, register, logout, getAuthHeader }}>
       {children}
     </AuthContext.Provider>
   );

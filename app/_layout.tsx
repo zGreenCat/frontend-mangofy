@@ -11,11 +11,11 @@ import { useAuth } from '../src/hooks/useAuth';
 import ExploreScreen from '@/app/(tabs)/explore';
 import HomeScreen from '@/app/(tabs)/index';
 import LibraryScreen from '@/app/(tabs)/library';
+import { AudioProvider } from '../src/contexts/AudioContext';
 const Tab = createBottomTabNavigator();
 
 function AuthGate() {
   const { user, loading } = useAuth();
-
   if (loading) {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.strongOrange }}>
@@ -48,8 +48,10 @@ export default function RootLayout() {
 
   return (
     <AuthProvider >
+      <AudioProvider>
       <StatusBar barStyle="light-content" />  
       <AuthGate />
+      </AudioProvider>
     </AuthProvider>
   );
 }

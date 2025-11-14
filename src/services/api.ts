@@ -10,7 +10,7 @@ export async function initAuth() {
   const rt = await SecureStore.getItemAsync("refreshToken");
   if (!rt) return;
   try {
-    const { data } = await axios.post(`${API_URL}/auth/refresh`, { refreshToken: rt });
+    const { data } = await axios.post(`${API_URL}/api/auth/refresh`, { refreshToken: rt });
     accessToken = data.accessToken;
     await SecureStore.setItemAsync("refreshToken", data.refreshToken);
   } catch {
@@ -28,7 +28,7 @@ export async function clearSession() {
   const rt = await SecureStore.getItemAsync("refreshToken");
   if (rt) {
     try {
-      await axios.post(`${API_URL}/auth/logout`, { refreshToken: rt });
+      await axios.post(`${API_URL}/api/auth/logout`, { refreshToken: rt });
     } catch {}
   }
   await SecureStore.deleteItemAsync("refreshToken");
@@ -52,7 +52,7 @@ api.interceptors.request.use((config) => {
   if (!config) return config;
   // No adjuntar token a llamadas de auth (login/refresh/register)
   const url = config.url ?? "";
-  if (url.includes("/auth/refresh") || url.includes("/auth/login") || url.includes("/auth/register")) {
+  if (url.includes("/api/auth/refresh") || url.includes("/api/auth/login") || url.includes("/api/auth/register")) {
     return config;
   }
   if (accessToken) {
@@ -85,7 +85,7 @@ api.interceptors.response.use(
       refreshing = (async () => {
         const rt = await SecureStore.getItemAsync("refreshToken");
         if (!rt) throw axiosError;
-        const { data } = await axios.post(`${API_URL}/auth/refresh`, { refreshToken: rt });
+        const { data } = await axios.post(`${API_URL}/api/auth/refresh`, { refreshToken: rt });
         accessToken = data.accessToken;
         await SecureStore.setItemAsync("refreshToken", data.refreshToken);
       })().finally(() => {
@@ -106,3 +106,6 @@ api.interceptors.response.use(
     }
   }
 );
+export function getAccessToken() {
+  return accessToken; // devuelve el valor en memoria que está usando axios
+}
