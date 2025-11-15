@@ -1,56 +1,41 @@
+// app/_layout.tsx
+import { Colors } from "@/constants/theme";
+import { AudioProvider } from "@/src/contexts/AudioContext";
+import { AuthProvider } from "@/src/contexts/AuthContext";
+import { useAuth } from "@/src/hooks/useAuth";
+import { Stack } from "expo-router";
+import { ActivityIndicator, StatusBar, View } from "react-native";
 
-import LoginScreen from "@/src/screens/LoginScreen";
-import { Ionicons } from '@expo/vector-icons';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { ActivityIndicator, StatusBar, View } from 'react-native';
-import 'react-native-reanimated';
-import { Colors } from "../constants/theme";
-import { AuthProvider } from '../src/contexts/AuthContext';
-import { useAuth } from '../src/hooks/useAuth';
-
-import ExploreScreen from '@/app/(tabs)/explore';
-import HomeScreen from '@/app/(tabs)/index';
-import LibraryScreen from '@/app/(tabs)/library';
-import { AudioProvider } from '../src/contexts/AudioContext';
-const Tab = createBottomTabNavigator();
-
-function AuthGate() {
+function AuthGate({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   if (loading) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.strongOrange }}>
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: Colors.strongOrange }}>
         <ActivityIndicator size="large" color="#fff" />
       </View>
-    )
+    );
   }
-  if(!user) {return <LoginScreen />}
-
-  return (
-    <Tab.Navigator 
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: { backgroundColor: Colors.purple, borderTopColor: "#222" },
-        tabBarActiveTintColor: '#fff',
-        tabBarInactiveTintColor: '#fff',
-      }}>
-    
-        
-        <Tab.Screen name="Home"  component={HomeScreen} options={{tabBarIcon: ({color,size}) => <Ionicons name="home" size= {size} color={color} />,}}/>
-        <Tab.Screen name="Buscar" component={ExploreScreen} options={{tabBarIcon: ({color,size}) => <Ionicons name="search" size={size} color={color} />,}} />
-        <Tab.Screen name="Tu Biblioteca" options={{title: 'Tu Biblioteca', tabBarIcon: ({color,size}) => <Ionicons name="library" size={size} color={color} />,}} component={LibraryScreen} />
-      </Tab.Navigator>
-  )
+  if (!user) {
+    // Renderiza tu login como una pantalla “fuera del router”
+    const LoginScreen = require("@/src/screens/LoginScreen").default;
+    return <LoginScreen />;
+  }
+  return <>{children}</>;
 }
 
-
-
 export default function RootLayout() {
-
   return (
-    <AuthProvider >
+    <AuthProvider>
       <AudioProvider>
-      <StatusBar barStyle="light-content" />  
-      <AuthGate />
+        <StatusBar barStyle="light-content" />
+        <AuthGate>
+          <Stack screenOptions={{ headerShown: false }}>
+            {/* Tu grupo de tabs vive aquí */}
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            {/* Player FUERA de las tabs */}
+            <Stack.Screen name="player" options={{ headerShown: false, presentation: "card" }} />
+          </Stack>
+        </AuthGate>
       </AudioProvider>
     </AuthProvider>
   );
