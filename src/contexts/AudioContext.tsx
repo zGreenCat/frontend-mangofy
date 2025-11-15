@@ -1,5 +1,6 @@
 import { useAuth } from '@/src/hooks/useAuth';
 import { getUploadSignature, saveAudioMeta, uploadToCloudinary } from "@/src/services/audioApi";
+import { addToLibrary } from "@/src/services/libraryApi";
 import { Audio, AVPlaybackStatusSuccess } from "expo-av";
 import React, {
   createContext,
@@ -35,7 +36,8 @@ interface AudioContextValue {
   prev: () => Promise<void>;
   uploadAndPlay: (file: { uri: string; name?: string; mimeType?: string }) => Promise<void>;
   setProgress?: (n: number) => void;
-  progress?: number; 
+  progress?: number;
+  uploadToLibrary: (file: { uri: string; name?: string; mimeType?: string }) => Promise<{ id: string; title: string }>;
 }
 
 export const AudioCtx = createContext<AudioContextValue | null>(null);
@@ -231,6 +233,45 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     return () => { void unload(); };
   }, [unload]);
 
+const uploadToLibrary = useCallback(
+  async (file: { uri: string; name?: string; mimeType?: string }) => {
+    if (!accessToken) throw new Error("No autenticado");
+
+    // 1) firma
+    const sig = await getUploadSignature(accessToken);
+    // 2) subir a Cloudinary
+    const uploaded = await uploadToCloudinary({
+      fileUri: file.uri,
+      fileName: file.name ?? "audio.mp3",
+      mimeType: file.mimeType ?? "audio/mpeg",
+      sig,
+      onProgress: (p) => setProgress(Math.min(99, Math.max(0, p))),
+    });
+    // 3) guardar metadatos
+    const title = (file.name ?? "Sin título").replace(/\.[^/.]+$/, "") || "Sin título";
+    const saved = await saveAudioMeta(
+      {
+        title,
+        public_id: uploaded.public_id,
+        format: uploaded.format ?? "mp3",
+        duration_sec: Number(uploaded.duration) || undefined,
+        bytes: typeof uploaded.bytes === "number" ? uploaded.bytes : undefined,
+        visibility: "public",
+      },
+      accessToken
+    );
+    // 4) agregar a biblioteca del usuario
+    await addToLibrary(saved.id, accessToken);
+
+    setProgress(0);
+    return saved; // por si quieres usarlo en UI
+  },
+  [accessToken]
+  );
+
+
+
+  
   const value: AudioContextValue = {
     current,
     queue,
@@ -246,7 +287,9 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     prev,
     uploadAndPlay,
     setProgress,
-    progress // opcional exponer progreso
+    uploadToLibrary,
+    progress,
+     // opcional exponer progreso
   };
 
   return <AudioCtx.Provider value={value}>{children}</AudioCtx.Provider>;

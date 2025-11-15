@@ -1,4 +1,4 @@
-import { api, clearSession, getAccessToken, initAuth, setSession } from '@/src/services/api';
+import { api, clearSession, getAccessToken, initAuth, setSession } from '@/src/services/authApi';
 import * as SecureStore from 'expo-secure-store';
 import React, { createContext, useEffect, useState } from 'react';
 

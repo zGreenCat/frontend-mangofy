@@ -71,6 +71,8 @@ export function uploadToCloudinary(opts: {
     form.append("signature", sig.signature);
     form.append("upload_preset", sig.upload_preset);
     form.append("folder", sig.folder); // 👈 IMPORTANTE
+    console.log("[sig]", sig);
+    console.log("[upload URL]", `https://api.cloudinary.com/v1_1/${sig.cloudName}/video/upload`);
     const url = `https://api.cloudinary.com/v1_1/${sig.cloudName}/video/upload`; // audio => video
 
     const xhr = new XMLHttpRequest();
